@@ -21,6 +21,7 @@ var io = socket_io();
 //io.set('transports', ['websocket']);
 app.io = io;
 var flag=0;
+
 new CronJob('* * 1 * * *', function(){
   if(flag==0)
     require('./socket')(app);
@@ -31,7 +32,9 @@ new CronJob('* * 1 * * *', function(){
 
 
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/frontend/home.html');
+  
+  // res.sendFile(__dirname + '/frontend/home.html');
+    res.render('home');
   
 });
 
@@ -40,7 +43,7 @@ var db=require('./config/db');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+app.set('view engine', 'ejs');
 
 
 // uncomment after placing your favicon in /public

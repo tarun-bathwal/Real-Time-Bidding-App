@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>The Bidding page</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+</head>
+<body>
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-4">
+        <img id="product_image" name="product_image" height=100 width=100>
+    </div>
+    <div class="col-md-4" >
+        <br>
+        <div class="row">
+            <label for="curr_bid_user">Current Bid User</label><br>
+            <input type="text" id="curr_bid_user" readonly class="form-control" name="curr_bid_user" contenteditable="false">
+        </div><br>
+        <div class="row">
+            <label for="curr_bid_amount">Current Bid Amount</label><br>
+            <input type="text" id="curr_bid_amount" class="form-control" readonly  name="curr_bid_amount" contenteditable="false"><br>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-5">
+        <p id="product_description"></p>
+    </div>
+    <div class="col-md-2"><br>
+            <input type="button" id="bid" class="btn btn-success form-control" name="bid" value="Place Bid">
+    </div>
+    <div class="col-md-3"></div>
+    </div>
+
+    <button id="changeroom">change room</button>
+
+    <p id="tellme"></p>
+</div>
+<script src="jquery.js"></script>
+
+
+<script src="../socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://localhost:3000');
+
+    socket.emit('newuser', {
+        username: 'tarun'
+    });
+
+    socket.on('user joined',function(data){
+        console.log('a new user '+data.username+" joined in "+data.roomname);
+        $('#curr_bid_amount').val(data.newbid);
+        $('#curr_bid_user').val(data.newbidder);
+    });
+
+    socket.on('user left',function(data){
+        console.log('the user named '+data.username+" has left the room "+data.previousroom);
+    })
+
+    // $('#changeroom').on('click',function(){
+    //     socket.emit('changeroom',{
+    //         roomname: "BIDDINGroom2",
+    //         username:'tarun'
+    //     });
+    // });
+
+    $('#bid').on('click',function(){
+        var bidamt = $('#curr_bid_amount').val();
+        var prev_bidder = $('#curr_bid_user').val();
+        if(bidamt !=''){
+            console.log("inside if");
+            socket.emit('bid placed',{
+                prev_bidder : prev_bidder,
+                bidamt : bidamt,
+                curr_bidder : 'pranjal'
+            });
+        }
+    });
+
+    socket.on('bid updated',function(data){
+        console.log('inside bid updated');
+        $('#curr_bid_amount').val(data.new_bid_amt);
+        $('#curr_bid_user').val(data.bidholder);
+    });
+
+    socket.on('late bid',function(data){
+        console.log(data.reason);
+    });
+
+    socket.on('changeprod',function(data){
+        console.log('new product');
+        $('#curr_bid_amount').val(data.bidamt);
+        $('#curr_bid_user').val(data.bidder);
+        $('#product_image').attr('src',data.prod_image);
+        console.log(data.prod_image);
+        $('#product_description').html(data.prod_desc);
+        $('#curr_bid_user').val(data.bidder);
+        setTimeout(function(){
+            $('#tellme').val('30 sec passed');
+            console.log("30 sec passed");
+        },30000);
+    });
+
+    socket.on('first_conn',function(data){
+        $('#curr_bid_amount').val(data.bidamt);
+        $('#curr_bid_user').val(data.bidder);
+        $('#product_image').src=data.prod_image;
+        console.log(data.prod_image);
+        $('#product_description').html(data.prod_desc);
+        $('#curr_bid_user').val(data.bidder);
+    });
+
+
+ 
+</script>   
+
+
+
+
+</body>
+</html>

@@ -203,3 +203,11 @@ exports.login= function (req,res) {
        }
     });
 };
+
+exports.linkedinloginview=function (req,res) {
+    res.render('linkedIn_login.ejs');
+};
+
+exports.linkedinlogin=function (req,res) {
+
+};
